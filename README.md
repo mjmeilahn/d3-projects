@@ -1,2 +1,3 @@
-# d3-projects
-One repo that contains a list of my D3.js pet projects.
+# D3.js Projects
+
+1. TBD
