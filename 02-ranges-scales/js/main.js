@@ -19,7 +19,6 @@
 // .select()         ----> .querySelector()
 // .selectAll()      ----> .querySelectorAll()
 
-
 // CREATE SVG CONTAINER
 const svg = d3.select('#chart-area')
               .append('svg')
@@ -57,16 +56,28 @@ Promise.all([
     buildingData.forEach(d => d.height = +d.height)
 
     // CREATE ARRAY OF BUILDING NAMES
-    let buildingNames = []
+    const buildingNames = []
     buildingData.map(obj => buildingNames.push(obj.name))
+
+    const color = d3.scaleOrdinal()
+                    .domain(buildingNames)
+                    .range(d3.schemeCategory10)
 
     // SCALE WITHIN A RANGE
     // THERE ARE MANY TYPES OF SCALES
-    // 1. Linear - d3.scaleLinear()
-    // 2. Log - d3.scaleLog()
-    // 3. Time - d3.scaleTime() takes a JS Date Object in domain
-    // 4. Band - d3.scaleBand()
-    // 5. Ordinal - d3.scaleOrdinal()
+    // 1. LINEAR - ideal for linear data sets
+    //          d3.scaleLinear()
+    // 2. LOG - ideal for exponential data sets
+    //          d3.scaleLog()
+    // 3. TIME - takes a JS Date Object in domain
+    //          d3.scaleTime()
+    //            .domain(
+    //                [new Date(2000, 0, 1), new Date(2001, 0, 1)
+    //            )
+    // 4. BAND - Used mainly for bar charts
+    //           d3.scaleBand()
+    // 5. ORDINAL - ideal for assigning a color to a category
+    //              d3.scaleOrdinal()
     //                .domain(["Africa", "N. America", "Europe"])
     //                .range(d3.schemeCategory10)
 
@@ -80,6 +91,8 @@ Promise.all([
               .domain([0, 828])
               .range([0, 400])
 
+    // .invert() CAN SCALE "x" OR "y" VALUE BACK TO ORIGINAL
+
     // DROP BUILDING DATA INTO DOM NODES
     let rectangles = svg.selectAll('rect').data(buildingData)
 
@@ -91,10 +104,7 @@ Promise.all([
               .attr('width', x.bandwidth)
               .attr('height', d => y(d.height))
               .attr('fill', d => {
-                  if (d.name === 'Shanghai Tower') {
-                      return 'green'
-                  }
-                  return 'grey'
+                  return color(d.name)
               })
 }).catch(err => {
     console.log(err)
