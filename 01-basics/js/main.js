@@ -19,13 +19,13 @@ Promise.all([
     d3.json('data/age.json'),
     d3.json('data/buildings.json')
 ]).then(result => {
-    let [ageData, buildingData] = result
+    let [ages, buildings] = result
 
     // CONVERT "age" STRING TO INT
-    ageData.forEach(d => d.age = +d.age)
+    ages.forEach(d => d.age = +d.age)
 
     // DROP DATA IN FIRST
-    let circles = svg.selectAll('circle').data(ageData)
+    let circles = svg.selectAll('circle').data(ages)
 
     // BUILD SVG/HTML WITH DATA
     circles.enter()
@@ -41,10 +41,10 @@ Promise.all([
            })
 
     // CONVERT "height" STRING TO INT
-    buildingData.forEach(d => d.height = +d.height)
+    buildings.forEach(d => d.height = +d.height)
 
     // DROP BUILDING DATA INTO DOM NODES
-    let rectangles = svg.selectAll('rect').data(buildingData)
+    let rectangles = svg.selectAll('rect').data(buildings)
 
     // PAINT DOM NODES WITH BUILDING DATA
     rectangles.enter()
