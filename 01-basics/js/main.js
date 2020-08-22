@@ -24,10 +24,10 @@ Promise.all([
     // CONVERT "age" STRING TO INT
     ageData.forEach(d => d.age = +d.age)
 
-    // DROP AGE DATA INTO DOM NODES
+    // DROP DATA IN FIRST
     let circles = svg.selectAll('circle').data(ageData)
 
-    // PAINT DOM NODES WITH AGE DATA
+    // BUILD SVG/HTML WITH DATA
     circles.enter()
            .append('circle')
            .attr('cx', (d, i) => (i * 50) + 25)
