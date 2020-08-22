@@ -6,6 +6,19 @@
 // 4. ADD DATA TO TARGETED DOM NODES INSIDE SVG
 // 5. PAINT DOM NODES INSIDE SVG
 
+// TYPES:
+// 1. svg
+// 2. rect
+// 3. circle
+// 4. ellipse
+// 5. line
+// 6. text
+// 7. path
+
+// D3 METHODS:
+// .select()         ----> .querySelector()
+// .selectAll()      ----> .querySelectorAll()
+
 
 // CREATE SVG CONTAINER
 const svg = d3.select('#chart-area')
