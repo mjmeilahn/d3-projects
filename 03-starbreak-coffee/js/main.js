@@ -50,7 +50,8 @@ Promise.all([
 
     // MOVES CHART
     const g = svg.append('g')
-                .attr('transform',
+                 .attr('class', 'chart')
+                 .attr('transform',
                     'translate(' + margin.left + ',' + margin.top + ')')
 
     // ASSIGNS A COLOR TO CATEGORIES

@@ -1,4 +1,10 @@
 
+// GLOBALS
+let xAxis
+let yAxis
+let xAxisGroup
+let yAxisGroup
+
 // SET CHART MARGINS
 const margin = {
     bottom: 150,
@@ -17,6 +23,12 @@ const svg = d3.select('#chart-area')
               .attr('width', width + margin.left + margin.right)
               .attr('height', height + margin.top + margin.bottom)
 
+// MOVES CHART
+const g = svg.append('g')
+             .attr('class', 'chart')
+             .attr('transform',
+                'translate(' + margin.left + ',' + margin.top + ')')
+
 // CREATE TEXT LABELS
 svg.append('text')
    .attr('class', 'x-axis-label')
@@ -33,6 +45,44 @@ svg.append('text')
    .attr('transform', 'rotate(-90)')
    .text('Revenue')
 
+// SHOW CATEGORIES ON X-AXIS
+xAxisGroup = g.append('g')
+              .attr('class', 'x-axis')
+              .attr('transform', 'translate(0, ' + height + ')')
+              .selectAll('text')
+                  .attr('y', 10)
+                  .attr('x', -5)
+
+// SHOW CATEGORIES ON Y-AXIS
+yAxisGroup = g.append('g')
+              .attr('class', 'y-axis')
+
+// UPDATE CHART
+const update = data => {
+    xAxis.domain(data.map(d => d.month))
+    yAxis.domain([0, d3.max(data, d => d.revenue)])
+
+    // SHOW CATEGORIES ON X-AXIS
+    const xAxisCall = d3.axisBottom(xAxis)
+    xAxisGroup.call(xAxisCall)
+
+    // SHOW CATEGORIES ON Y-AXIS
+    const yAxisCall = d3.axisLeft(yAxis)
+                        .tickFormat(d => '$' + d)
+    yAxisGroup.call(yAxisCall)
+
+    // CREATE VISUALS ON CHART
+    // const rectangles = g.selectAll('rect')
+    //                     .data(data)
+    //                     .enter()
+    //                     .append('rect')
+    //                     .attr('x', d => x(d.month))
+    //                     .attr('y', d => y(d.revenue))
+    //                     .attr('width', x.bandwidth)
+    //                     .attr('height', d => height - y(d.revenue))
+    //                     .attr('fill', d => color(d.month))
+}
+
 // CREATE CHART
 Promise.all([
     d3.json('data/revenues.json')
@@ -44,59 +94,27 @@ Promise.all([
     data.forEach(d => d.revenue = +d.revenue)
     data.forEach(d => d.profit = +d.profit)
 
-    // MAPS DOMAIN FOR X-AXIS
-    const months = []
-    data.map(d => months.push(d.month))
-
-    // MOVES CHART
-    const g = svg.append('g')
-                .attr('transform',
-                    'translate(' + margin.left + ',' + margin.top + ')')
-
     // ASSIGNS A COLOR TO CATEGORIES
     const color = d3.scaleOrdinal()
-                    .domain(months)
+                    .domain(data.map(d => d.month))
                     .range(d3.schemeCategory10)
 
     // CREATE BOUNDARIES ON X-AXIS
-    const x = d3.scaleBand()
-                .domain(months)
+    xAxis = d3.scaleBand()
+                .domain(data.map(d => d.month))
                 .range([0, width])
                 .paddingInner(0.3)
                 .paddingOuter(0.3)
 
     // CREATE BOUNDARIES ON Y-AXIS
-    const y = d3.scaleLinear()
+    yAxis = d3.scaleLinear()
                     .domain([0, d3.max(data, d => d.revenue)])
                     .range([height, 0])
 
-    // SHOW CATEGORIES ON X-AXIS
-    const xAxisCall = d3.axisBottom(x)
-    g.append('g')
-    .attr('class', 'x-axis')
-    .attr('transform', 'translate(0, ' + height + ')')
-    .call(xAxisCall)
-    .selectAll('text')
-        .attr('y', 10)
-        .attr('x', -5)
+    d3.interval(() => update(data), 1000)
 
-    // SHOW CATEGORIES ON Y-AXIS
-    const yAxisCall = d3.axisLeft(y)
-                        .tickFormat(d => '$' + d)
-    g.append('g')
-    .attr('class', 'y-axis')
-    .call(yAxisCall)
-
-    // CREATE VISUALS ON CHART
-    const rectangles = g.selectAll('rect')
-                        .data(data)
-                        .enter()
-                        .append('rect')
-                        .attr('x', d => x(d.month))
-                        .attr('y', d => y(d.revenue))
-                        .attr('width', x.bandwidth)
-                        .attr('height', d => height - y(d.revenue))
-                        .attr('fill', d => color(d.month))
+    // RUN THE VISUAL FOR THE FIRST TIME BEFORE LOOP BEGINS
+    update(data)
 }).catch(err => {
     console.log(err)
 })
