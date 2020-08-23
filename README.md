@@ -2,7 +2,7 @@
 
 Runtime Directions:
 1. python -m http.server
-2. Run in Incognito
+2. Run in Incognito & Clear Cache
 
 Projects:
 1. Basics - Exploring lifecycle methods to initialize a D3 instance, how to fetch and format data, configure appearance based on conditions and basic error handling.
