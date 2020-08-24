@@ -6,17 +6,18 @@ const height = 400 - margin.top - margin.bottom
 
 const g = d3.select('#chart-area')
             .append('svg')
+            .attr('class', 'chart')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
             .append('g')
             .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
 
 const xAxisGroup = g.append('g')
-                    .attr('class', 'x axis')
+                    .attr('class', 'x-axis')
                     .attr('transform', 'translate(0,' + height +')')
 
 const yAxisGroup = g.append('g')
-                    .attr('class', 'y axis')
+                    .attr('class', 'y-axis')
 
 // X Scale
 const x = d3.scaleBand()
@@ -28,34 +29,41 @@ const y = d3.scaleLinear()
             .range([height, 0])
 
 // X Label
-g.append('text')
- .attr('y', height + 50)
- .attr('x', width / 2)
- .attr('font-size', '20px')
- .attr('text-anchor', 'middle')
- .text('Month')
+const xLabel = g.append('text')
+                .attr('y', height + 50)
+                .attr('x', width / 2)
+                .attr('font-size', '20px')
+                .attr('text-anchor', 'middle')
+                .text('Month')
 
 // Y Label
-g.append('text')
- .attr('y', -60)
- .attr('x', -(height / 2))
- .attr('font-size', '20px')
- .attr('text-anchor', 'middle')
- .attr('transform', 'rotate(-90)')
- .text('Revenue')
+let yLabel = g.append('text')
+              .attr('y', -60)
+              .attr('x', -(height / 2))
+              .attr('font-size', '20px')
+              .attr('text-anchor', 'middle')
+              .attr('transform', 'rotate(-90)')
+              .text('Revenue')
+
+let flag = false
 
 d3.json('data/revenues.json').then(data => {
     // Clean data
     data.forEach(d => d.revenue = +d.revenue)
     data.forEach(d => d.profit = +d.profit)
 
-    d3.interval(() => update(data), 1000)
+    d3.interval(() => {
+        update(data)
+        flag = !flag
+    }, 1000)
 
     // Run the visual for the first time
     update(data)
 })
 
 const update = data => {
+    let value = flag ? 'revenue' : 'profit'
+
     x.domain(data.map(d => d.month))
     y.domain([0, d3.max(data, d => d.revenue)])
 
@@ -77,17 +85,20 @@ const update = data => {
 
     // UPDATE old elements present in new data.
     rects
-        .attr('y', d => y(d.revenue))
+        .attr('y', d => y(d[value])) // used to be d.revenue
         .attr('x', d => x(d.month))
-        .attr('height', d => height - y(d.revenue))
+        .attr('height', d => height - y(d[value])) // used to be d.revenue
         .attr('width', x.bandwidth)
 
     // ENTER new elements present in new data.
     rects.enter()
          .append('rect')
-            .attr('y', d => y(d.revenue))
+            .attr('y', d => y(d[value])) // used to be d.revenue
             .attr('x', d => x(d.month))
-            .attr('height', d => height - y(d.revenue))
+            .attr('height', d => height - y(d[value])) // used to be d.revenue
             .attr('width', x.bandwidth)
             .attr('fill', 'grey')
+
+    let label = flag ? 'Revenue' : 'Profit'
+    yLabel.text(label)
 }
