@@ -80,39 +80,36 @@ const update = data => {
     yAxisGroup.transition(t).call(yAxisCall)
 
     // JOIN new data with old elements.
-    const rects = g.selectAll('rect')
-                   .data(data, d => d.month)
+    const circles = g.selectAll('circle')
+                     .data(data, d => d.month)
 
     // EXIT old elements not present in new data.
-    rects
+    circles
         .exit()
         .attr('fill', 'red')
         .transition(t)
-        .attr('y', y(0))
-        .attr('height', 0)
+        .attr('cy', y(0))
         .remove()
 
     // UPDATE old elements present in new data.
-    rects
-        .transition(t)
-        .attr('y', d => y(d[value])) // used to be d.revenue
-        .attr('x', d => x(d.month))
-        .attr('height', d => height - y(d[value])) // used to be d.revenue
-        .attr('width', x.bandwidth)
+    // circles
+    //     .transition(t)
+    //     .attr('cy', d => y(d[value])) // used to be d.revenue
+    //     .attr('cx', d => x(d.month))
+    //     .attr('height', d => height - y(d[value])) // used to be d.revenue
 
     // ENTER new elements present in new data.
-    rects.enter()
-         .append('rect')
-            .attr('x', d => x(d.month))
-            .attr('width', x.bandwidth)
-            .attr('fill', 'grey')
-            .attr('y', y(0))
-            .attr('height', 0)
-            // AND UPDATE old elements present in new data
-            .merge(rects)
-            .transition(t)
-            .attr('y', d => y(d[value])) // used to be d.revenue
-            .attr('height', d => height - y(d[value])) // used to be d.revenue
+    circles.enter()
+           .append('circle')
+           .attr('fill', 'grey')
+           .attr('cx', d => x(d.month) + x.bandwidth() / 2)
+           .attr('cy', y(0))
+           .attr('r', 5)
+           // AND UPDATE old elements present in new data
+           .merge(circles)
+           .transition(t)
+           .attr('cx', d => x(d.month) + x.bandwidth() / 2)
+           .attr('cy', d => y(d[value])) // used to be d.revenue
 
     let label = flag ? 'Revenue' : 'Profit'
     yLabel.text(label)
